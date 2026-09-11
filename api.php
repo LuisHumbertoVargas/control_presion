@@ -1,15 +1,12 @@
 <?php
-$host = "db.uazlzqlxlcydeygpmreo.supabase.co";
-$db   = "control_presion_db"; 
-$user = "postgres";
-$pass = "Catehe0989#";          
-$port = "5432";
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db   = "presion_db";
 
-try {
-    $conn = new PDO("pgsql:host=$host;port=$port;dbname=$db", $user, $pass);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
+$conn = new mysqli($host, $user, $pass, $db);
+if ($conn->connect_error) {
+    die("Error de conexión: " . $conn->connect_error);
 }
 
 $action = $_GET['action'] ?? '';
@@ -17,20 +14,23 @@ $action = $_GET['action'] ?? '';
 if ($action === 'guardar') {
     $data = json_decode(file_get_contents("php://input"), true);
     $stmt = $conn->prepare("INSERT INTO registros (fecha,hora,sistolica,diastolica,pulso,estado,observaciones) VALUES (?,?,?,?,?,?,?)");
-    $stmt->execute([$data['fecha'], $data['hora'], $data['sis'], $data['dia'], $data['pul'], $data['estado'], $data['obs']]);
+    $stmt->bind_param("ssiiiss", $data['fecha'], $data['hora'], $data['sis'], $data['dia'], $data['pul'], $data['estado'], $data['obs']);
+    $stmt->execute();
     echo json_encode(["success" => true]);
 }
 
 if ($action === 'listar') {
-    $stmt = $conn->query("SELECT * FROM registros ORDER BY fecha,hora");
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $result = $conn->query("SELECT * FROM registros ORDER BY fecha,hora");
+    $rows = [];
+    while($row = $result->fetch_assoc()) {
+        $rows[] = $row;
+    }
     echo json_encode($rows);
 }
 
 if ($action === 'borrar') {
     $id = intval($_GET['id']);
-    $stmt = $conn->prepare("DELETE FROM registros WHERE id = ?");
-    $stmt->execute([$id]);
+    $conn->query("DELETE FROM registros WHERE id=$id");
     echo json_encode(["success" => true]);
 }
 ?>

@@ -1,3 +1,11 @@
+// Importar el cliente de Supabase
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+// 🔑 Configura con tus datos de Supabase
+const supabaseUrl = "https://uazlzqlxlcydeygpmreo.supabase.co"; // tu URL de proyecto
+const supabaseKey = "TU_ANON_KEY"; // copia el anon key desde Project Settings → API
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 // Evaluar presión y asignar estado
 function evaluarPresion(sis, dia) {
   if (sis < 120 && dia < 80) return {estado: "Normal", clase: "normal"};
@@ -105,53 +113,109 @@ function actualizarGrafico() {
   grafico.update();
 }
 
-// --- API PHP / BD ---
-function guardarRegistro(fila) {
+// Guardar
+async function guardarRegistro(fila) {
   const data = {
     fecha: fila.cells[0].querySelector("input").value,
     hora: fila.cells[1].querySelector("input").value,
-    sis: parseInt(fila.cells[2].querySelector("input").value),
-    dia: parseInt(fila.cells[3].querySelector("input").value),
-    pul: parseInt(fila.cells[4].querySelector("input").value),
+    sistolica: parseInt(fila.cells[2].querySelector("input").value),
+    diastolica: parseInt(fila.cells[3].querySelector("input").value),
+    pulso: parseInt(fila.cells[4].querySelector("input").value),
     estado: fila.cells[5].textContent,
-    obs: fila.cells[6].querySelector("textarea").value
+    observaciones: fila.cells[6].querySelector("textarea").value
   };
 
-  fetch("api.php?action=guardar", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(data)
-  }).then(r => r.json()).then(res => {
-    if (res.success) {
-      alert("Registro guardado en BD");
-      cargarRegistros();
-    }
-  });
-}
-
-function cargarRegistros() {
-  fetch("api.php?action=listar")
-    .then(r => r.json())
-    .then(datos => {
-      const tbody = document.querySelector("#tablaPresion tbody");
-      tbody.innerHTML = "";
-      datos.forEach(d => agregarFila(d.fecha, d.hora, d.sistolica, d.diastolica, d.pulso, d.observaciones, d.id));
-      actualizarGrafico();
-    });
-}
-
-function borrarRegistro(id) {
-  if (confirm("¿Seguro que quieres borrar este registro?")) {
-    fetch("api.php?action=borrar&id=" + id)
-      .then(r => r.json())
-      .then(res => {
-        if (res.success) {
-          alert("Registro eliminado");
-          cargarRegistros();
-        }
-      });
+  const { error } = await supabase.from("registros").insert([data]);
+  if (error) {
+    console.error(error);
+  } else {
+    alert("Registro guardado en BD");
+    cargarRegistros();
   }
 }
+
+// Listar
+async function cargarRegistros() {
+  const { data, error } = await supabase
+    .from("registros")
+    .select("*")
+    .order("fecha", { ascending: true })
+    .order("hora", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const tbody = document.querySelector("#tablaPresion tbody");
+  tbody.innerHTML = "";
+  data.forEach(d =>
+    agregarFila(d.fecha, d.hora, d.sistolica, d.diastolica, d.pulso, d.observaciones, d.id)
+  );
+  actualizarGrafico();
+}
+
+// Borrar
+async function borrarRegistro(id) {
+  if (confirm("¿Seguro que quieres borrar este registro?")) {
+    const { error } = await supabase.from("registros").delete().eq("id", id);
+    if (error) {
+      console.error(error);
+    } else {
+      alert("Registro eliminado");
+      cargarRegistros();
+    }
+  }
+}
+
+
+// --- API PHP / BD ---
+// function guardarRegistro(fila) {
+//   const data = {
+//     fecha: fila.cells[0].querySelector("input").value,
+//     hora: fila.cells[1].querySelector("input").value,
+//     sis: parseInt(fila.cells[2].querySelector("input").value),
+//     dia: parseInt(fila.cells[3].querySelector("input").value),
+//     pul: parseInt(fila.cells[4].querySelector("input").value),
+//     estado: fila.cells[5].textContent,
+//     obs: fila.cells[6].querySelector("textarea").value
+//   };
+
+//   fetch("api.php?action=guardar", {
+//     method: "POST",
+//     headers: {"Content-Type": "application/json"},
+//     body: JSON.stringify(data)
+//   }).then(r => r.json()).then(res => {
+//     if (res.success) {
+//       alert("Registro guardado en BD");
+//       cargarRegistros();
+//     }
+//   });
+// }
+
+// function cargarRegistros() {
+//   fetch("api.php?action=listar")
+//     .then(r => r.json())
+//     .then(datos => {
+//       const tbody = document.querySelector("#tablaPresion tbody");
+//       tbody.innerHTML = "";
+//       datos.forEach(d => agregarFila(d.fecha, d.hora, d.sistolica, d.diastolica, d.pulso, d.observaciones, d.id));
+//       actualizarGrafico();
+//     });
+// }
+
+// function borrarRegistro(id) {
+//   if (confirm("¿Seguro que quieres borrar este registro?")) {
+//     fetch("api.php?action=borrar&id=" + id)
+//       .then(r => r.json())
+//       .then(res => {
+//         if (res.success) {
+//           alert("Registro eliminado");
+//           cargarRegistros();
+//         }
+//       });
+//   }
+// }
 
 // --- Exportar CSV ---
 function exportarCSV() {
