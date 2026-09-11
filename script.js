@@ -3,7 +3,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 // 🔑 Configura con tus datos de Supabase
 const supabaseUrl = "https://uazlzqlxlcydeygpmreo.supabase.co"; // tu URL de proyecto
-const supabaseKey = "sb_publishable_NKESrfYA2Shu3_Xw4xsZ8g_vAAiIGiv"; // copia el anon key desde Project Settings → API
+const supabaseKey = "sb_publishable_NKESrfYA2Shu3_Xw4xsZ8g_vAAiIGiveyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhemx6cWx4bGN5ZGV5Z3BtcmVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxNDk5MDIsImV4cCI6MjEwNDcyNTkwMn0.IBWmwkBRmDj_pl8ByEb6tEN2-aEQOEyncjqLf_UurXk"; // copia el anon key desde Project Settings → API
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Evaluar presión y asignar estado
