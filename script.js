@@ -1,8 +1,6 @@
 
 import { supabase } from "./supabaseClient.js";
 
-
-
 // Evaluar presión y asignar estado
 function evaluarPresion(sis, dia) {
   if (sis < 120 && dia < 80) return {estado: "Normal", clase: "normal"};
