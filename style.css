@@ -1,0 +1,95 @@
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  margin: 20px;
+  background: #f5f5f5;
+  color: #333;
+}
+
+h1 {
+  text-align: center;
+  color: #0d143b;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background: #0d143b;
+  color: #fff;
+}
+
+input[type="date"],
+input[type="time"],
+input[type="number"],
+input[type="text"] {
+  width: 95%;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+button {
+  margin: 8px 5px;
+  padding: 8px 14px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background: #0d143b;
+  color: #fff;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #1a237e;
+}
+
+.btnBorrarFila {
+  background: #c62828;
+}
+
+.btnBorrarFila:hover {
+  background: #b71c1c;
+}
+
+.normal { background-color: #c8e6c9; }
+.elevada { background-color: #fff9c4; }
+.hip1 { background-color: #ffe0b2; }
+.hip2 { background-color: #ffcdd2; }
+
+canvas {
+  margin-top: 30px;
+  background: #fff;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.botonera {
+  text-align: center;
+  margin-top: 15px;
+}
+
+textarea.observaciones {
+  width: 95%;
+  min-height: 50px;
+  resize: vertical; /* permite agrandar manualmente */
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+

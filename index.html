@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Presión Arterial</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Registro de Presión Arterial</h1>
+
+  <table id="tablaPresion">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Sistólica (mmHg)</th>
+        <th>Diastólica (mmHg)</th>
+        <th>Pulso (bpm)</th>
+        <th>Estado</th>
+        <th>Observaciones</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="botonera">
+    <button id="btnFila">➕ Añadir fila</button>
+    <button id="btnGrafico">📈 Actualizar gráfico</button>
+    <button id="btnGuardar">💾 Guardar Registros</button>
+    <button id="btnCargar">📂 Cargar</button>
+    <button id="btnCSV">⬇️ Exportar CSV</button>
+  </div>
+
+  <canvas id="graficoPresion" width="400" height="200"></canvas>
+
+  <script src="script.js"></script>
+</body>
+</html>
