@@ -3,7 +3,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 // 🔑 Configura con tus datos de Supabase
 const supabaseUrl = "https://uazlzqlxlcydeygpmreo.supabase.co"; // tu URL de proyecto
-const supabaseKey = "TU_ANON_KEY"; // copia el anon key desde Project Settings → API
+const supabaseKey = "sb_publishable_NKESrfYA2Shu3_Xw4xsZ8g_vAAiIGiv"; // copia el anon key desde Project Settings → API
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Evaluar presión y asignar estado
