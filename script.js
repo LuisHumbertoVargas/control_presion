@@ -40,8 +40,8 @@ function agregarFila(fecha="", hora="", sis="", dia="", pul="", obs="", id=null)
     <td><input type="number" min="30" max="150" value="${dia}"></td>
     <td><input type="number" min="30" max="200" value="${pul}"></td>
     <td class="estado"></td>
-    <td><textarea rows="2" class="observaciones">${obs}</textarea></td>
-    <td><button class="btnBorrarFila">❌ Borrar</button></td>
+    <td><textarea rows="6" class="observaciones">${obs}</textarea></td>
+    <td><button class="btnBorrarFila"><i class="fas fa-trash"></i> Borrar</button></td>
   `;
   tbody.appendChild(fila);
 
@@ -288,7 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
     actualizarResumen();
   });
 
-  document.getElementById("btnCSV").addEventListener("click", exportarCSV);
+  document.getElementById("btnExcel").addEventListener("click", exportarExcel);
 
   // Inicializa cargando registros desde BD
   cargarRegistros();

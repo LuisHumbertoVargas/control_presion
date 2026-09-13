@@ -5,6 +5,10 @@
   <title>Dashboard de Presión Arterial</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/js/all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
+
 </head>
 <body>
   <header>
@@ -62,7 +66,7 @@
     <button id="btnGrafico">📈 Actualizar gráfico</button>
     <button id="btnGuardar">💾 Guardar Registros</button>
     <button id="btnCargar">📂 Cargar</button>
-    <button id="btnCSV">⬇️ Exportar CSV</button>
+    <button id="btnExcel"><i class="fas fa-file-excel"></i> Exportar a Excel</button>
   </div>
 
   <!-- Gráfico -->
@@ -72,9 +76,10 @@
   </section>
 
   <footer>
-    <p>👨‍⚕️ Este dashboard no sustituye la consulta médica. Ante valores elevados, acude a tu médico.</p>
+    <p>👨‍⚕️ Este dashboard no sustituye la consulta médica. Solo es un apoyo para el seguimiento de mi presión arterial.</p>
   </footer>
 
   <script type="module" src="./script.js"></script>
+  <script src="exportarExcel.js"></script>
 </body>
 </html>

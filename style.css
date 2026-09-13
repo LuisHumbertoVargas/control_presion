@@ -65,12 +65,14 @@ header p {
 .card.estado p {
   font-size: 1.2rem;
   font-weight: bold;
+  padding-top: 12px;
+  padding-bottom: 12px;
 }
 
-.normal { background-color: #d4edda; }
-.elevada { background-color: #fff3cd; }
-.hip1 { background-color: #ffeeba; }
-.hip2 { background-color: #f8d7da; }
+.normal { background-color: #c8e6c9; }
+.elevada { background-color: #fff9c4; }
+.hip1 { background-color: #ffe0b2; }
+.hip2 { background-color: #ffcdd2; }
 
 /* Tips de salud */
 .tip {
@@ -105,8 +107,23 @@ th, td {
   border-bottom: 1px solid #ddd;
 }
 
-tbody tr:hover {
+/* tbody tr:hover {
   background: #f1f1f1;
+} */
+
+.btnBorrarFila {
+  background: #fff;              /* Fondo blanco */
+  color: #c62828;                /* Texto rojo */
+  border: 2px solid #c62828;     /* Borde rojo */
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+.btnBorrarFila:hover {
+  background: #c62828;           /* Fondo rojo */
+  color: #fff;                   /* Texto blanco */
 }
 
 /* Botonera */
