@@ -2,29 +2,61 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Registro de Presión Arterial</title>
+  <title>Dashboard de Presión Arterial</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <h1>Registro de Presión Arterial</h1>
+  <header>
+    <h1>📊 Dashboard de Presión Arterial</h1>
+    <p>Monitoreo y recomendaciones personalizadas</p>
+  </header>
 
-  <table id="tablaPresion">
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Hora</th>
-        <th>Sistólica (mmHg)</th>
-        <th>Diastólica (mmHg)</th>
-        <th>Pulso (bpm)</th>
-        <th>Estado</th>
-        <th>Observaciones</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <!-- Panel de resumen -->
+  <section id="resumenSalud" class="resumen">
+    <h2>Resumen de la última semana</h2>
+    <div class="resumen-grid">
+      <div class="card">
+        <h3>Promedio Sistólica</h3>
+        <p><span id="avgSis">--</span> mmHg</p>
+      </div>
+      <div class="card">
+        <h3>Promedio Diastólica</h3>
+        <p><span id="avgDia">--</span> mmHg</p>
+      </div>
+      <div class="card">
+        <h3>Promedio Pulso</h3>
+        <p><span id="avgPul">--</span> bpm</p>
+      </div>
+      <div class="card estado">
+        <h3>Estado predominante</h3>
+        <p id="estadoPred">--</p>
+      </div>
+    </div>
+    <div id="tipSalud" class="tip"></div>
+  </section>
 
+  <!-- Tabla de registros -->
+  <section>
+    <h2>Registros</h2>
+    <table id="tablaPresion">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Sistólica (mmHg)</th>
+          <th>Diastólica (mmHg)</th>
+          <th>Pulso (bpm)</th>
+          <th>Estado</th>
+          <th>Observaciones</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- Botonera -->
   <div class="botonera">
     <button id="btnFila">➕ Añadir fila</button>
     <button id="btnGrafico">📈 Actualizar gráfico</button>
@@ -33,7 +65,16 @@
     <button id="btnCSV">⬇️ Exportar CSV</button>
   </div>
 
-  <canvas id="graficoPresion" width="400" height="200"></canvas>
+  <!-- Gráfico -->
+  <section>
+    <h2>Evolución de la presión</h2>
+    <canvas id="graficoPresion" width="400" height="200"></canvas>
+  </section>
+
+  <footer>
+    <p>👨‍⚕️ Este dashboard no sustituye la consulta médica. Ante valores elevados, acude a tu médico.</p>
+  </footer>
+
   <script type="module" src="./script.js"></script>
 </body>
 </html>

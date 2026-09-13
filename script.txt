@@ -1,6 +1,7 @@
+
 import { supabase } from "./supabaseClient.js";
 
-// --- Evaluar presión y asignar estado ---
+// Evaluar presión y asignar estado
 function evaluarPresion(sis, dia) {
   if (sis < 120 && dia < 80) return {estado: "Normal", clase: "normal"};
   if (sis >= 120 && sis <= 129 && dia < 80) return {estado: "Elevada", clase: "elevada"};
@@ -26,13 +27,15 @@ function actualizarEstados() {
   });
 }
 
-// --- Añadir fila editable ---
+// Añadir fila editable
 function agregarFila(fecha="", hora="", sis="", dia="", pul="", obs="", id=null) {
   const tbody = document.querySelector("#tablaPresion tbody");
   const fila = document.createElement("tr");
-
-  if (id) fila.dataset.id = String(id);
-
+  
+  if (id !== null && id !== undefined && id !== "") {
+    fila.dataset.id = String(id);
+  }
+   
   fila.innerHTML = `
     <td><input type="date" value="${fecha}"></td>
     <td><input type="time" value="${hora}"></td>
@@ -46,21 +49,18 @@ function agregarFila(fecha="", hora="", sis="", dia="", pul="", obs="", id=null)
   tbody.appendChild(fila);
 
   fila.querySelectorAll("input, textarea").forEach(input => {
-    input.addEventListener("input", () => {
-      actualizarEstados();
-      actualizarResumen();
-    });
+    input.addEventListener("input", actualizarEstados);
   });
 
   fila.querySelector(".btnBorrarFila").addEventListener("click", () => {
     const id = fila.dataset.id;
+
     if (id) {
       borrarRegistro(id);
     } else if (confirm("¿Seguro que quieres borrar este registro sin guardar?")) {
       fila.remove();
       actualizarEstados();
       actualizarGrafico();
-      actualizarResumen();
     }
   });
 
@@ -88,6 +88,7 @@ const grafico = new Chart(ctx, {
   }
 });
 
+
 function actualizarGrafico() {
   const filas = document.querySelectorAll("#tablaPresion tbody tr");
   const fechas = [], sistolica = [], diastolica = [], pulso = [];
@@ -111,11 +112,59 @@ function actualizarGrafico() {
   grafico.update();
 }
 
-// --- Supabase CRUD ---
+// --- API PHP / BD ---
+// function guardarRegistro(fila) {
+//   const data = {
+//     fecha: fila.cells[0].querySelector("input").value,
+//     hora: fila.cells[1].querySelector("input").value,
+//     sis: parseInt(fila.cells[2].querySelector("input").value),
+//     dia: parseInt(fila.cells[3].querySelector("input").value),
+//     pul: parseInt(fila.cells[4].querySelector("input").value),
+//     estado: fila.cells[5].textContent,
+//     obs: fila.cells[6].querySelector("textarea").value
+//   };
+
+//   fetch("api.php?action=guardar", {
+//     method: "POST",
+//     headers: {"Content-Type": "application/json"},
+//     body: JSON.stringify(data)
+//   }).then(r => r.json()).then(res => {
+//     if (res.success) {
+//       alert("Registro guardado en BD");
+//       cargarRegistros();
+//     }
+//   });
+// }
+
+// function cargarRegistros() {
+//   fetch("api.php?action=listar")
+//     .then(r => r.json())
+//     .then(datos => {
+//       const tbody = document.querySelector("#tablaPresion tbody");
+//       tbody.innerHTML = "";
+//       datos.forEach(d => agregarFila(d.fecha, d.hora, d.sistolica, d.diastolica, d.pulso, d.observaciones, d.id));
+//       actualizarGrafico();
+//     });
+// }
+
+// function borrarRegistro(id) {
+//   if (confirm("¿Seguro que quieres borrar este registro?")) {
+//     fetch("api.php?action=borrar&id=" + id)
+//       .then(r => r.json())
+//       .then(res => {
+//         if (res.success) {
+//           alert("Registro eliminado");
+//           cargarRegistros();
+//         }
+//       });
+//   }
+// }
+
 const TABLA = "registros_presion";
 
 async function guardarRegistro(fila) {
   const id = fila.dataset.id;
+
   const data = {
     fecha: fila.cells[0].querySelector("input").value || null,
     hora: fila.cells[1].querySelector("input").value || null,
@@ -127,11 +176,24 @@ async function guardarRegistro(fila) {
   };
 
   let resultado;
+
   if (id) {
-    resultado = await supabase.from(TABLA).update(data).eq("id", id);
+    // Actualizar registro existente
+    resultado = await supabase
+      .from(TABLA)
+      .update(data)
+      .eq("id", id);
   } else {
-    resultado = await supabase.from(TABLA).insert(data).select().single();
-    if (resultado.data) fila.dataset.id = resultado.data.id;
+    // Crear registro nuevo
+    resultado = await supabase
+      .from(TABLA)
+      .insert(data)
+      .select()
+      .single();
+
+    if (resultado.data) {
+      fila.dataset.id = resultado.data.id;
+    }
   }
 
   if (resultado.error) {
@@ -139,6 +201,7 @@ async function guardarRegistro(fila) {
     alert(`No se pudo guardar: ${resultado.error.message}`);
     return false;
   }
+
   return true;
 }
 
@@ -172,13 +235,18 @@ async function cargarRegistros() {
 
   actualizarEstados();
   actualizarGrafico();
-  actualizarResumen();
 }
 
 async function borrarRegistro(id) {
-  if (!id || !confirm("¿Seguro que quieres borrar este registro?")) return;
+  if (!id || !confirm("¿Seguro que quieres borrar este registro?")) {
+    return;
+  }
 
-  const { error } = await supabase.from(TABLA).delete().eq("id", id);
+  const { error } = await supabase
+    .from(TABLA)
+    .delete()
+    .eq("id", id);
+
   if (error) {
     console.error("Error eliminando registro:", error);
     alert(`No se pudo eliminar: ${error.message}`);
@@ -187,53 +255,6 @@ async function borrarRegistro(id) {
 
   alert("Registro eliminado");
   await cargarRegistros();
-}
-
-// --- Calcular promedios y mostrar resumen ---
-function actualizarResumen() {
-  const filas = document.querySelectorAll("#tablaPresion tbody tr");
-  let totalSis = 0, totalDia = 0, totalPul = 0, count = 0;
-  const estados = {};
-
-  filas.forEach(fila => {
-    const sis = parseInt(fila.cells[2].querySelector("input").value);
-    const dia = parseInt(fila.cells[3].querySelector("input").value);
-    const pul = parseInt(fila.cells[4].querySelector("input").value);
-    const estado = fila.cells[5].textContent;
-
-    if (!isNaN(sis) && !isNaN(dia) && !isNaN(pul)) {
-      totalSis += sis;
-      totalDia += dia;
-      totalPul += pul;
-      count++;
-      estados[estado] = (estados[estado] || 0) + 1;
-    }
-  });
-
-  if (count > 0) {
-    document.getElementById("avgSis").textContent = (totalSis / count).toFixed(1);
-    document.getElementById("avgDia").textContent = (totalDia / count).toFixed(1);
-    document.getElementById("avgPul").textContent = (totalPul / count).toFixed(1);
-
-    const estadoPred = Object.keys(estados).reduce((a, b) => estados[a] > estados[b] ? a : b);
-    document.getElementById("estadoPred").textContent = estadoPred;
-
-    let tip = "";
-    if (estadoPred.includes("Normal")) {
-      tip = "Mantén hábitos saludables: ejercicio regular, dieta balanceada y control del estrés.";
-      document.getElementById("estadoPred").className = "normal";
-    } else if (estadoPred.includes("Elevada")) {
-      tip = "Reduce consumo de sal, controla el peso y evita el exceso de alcohol.";
-      document.getElementById("estadoPred").className = "elevada";
-    } else if (estadoPred.includes("Hipertensión Etapa 1")) {
-      tip = "Consulta a tu médico para seguimiento y posibles ajustes de tratamiento.";
-      document.getElementById("estadoPred").className = "hip1";
-    } else if (estadoPred.includes("Hipertensión Etapa 2")) {
-      tip = "Requiere atención médica inmediata y control estricto.";
-      document.getElementById("estadoPred").className = "hip2";
-    }
-    document.getElementById("tipSalud").textContent = tip;
-  }
 }
 
 // --- Exportar CSV ---
@@ -263,34 +284,25 @@ function exportarCSV() {
 
 // --- Enlazar botones ---
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("btnFila").addEventListener("click", () => {
-    agregarFila();
-    actualizarResumen();
-  });
-
-  document.getElementById("btnGrafico").addEventListener("click", () => {
-    actualizarGrafico();
-    actualizarResumen();
-  });
-
+  document.getElementById("btnFila").addEventListener("click", () => agregarFila());
+  document.getElementById("btnGrafico").addEventListener("click", actualizarGrafico);
+  // document.getElementById("btnGuardar").addEventListener("click", () => {
+  //   const filas = document.querySelectorAll("#tablaPresion tbody tr");
+  //   filas.forEach(fila => guardarRegistro(fila));
+  // });
   document.getElementById("btnGuardar").addEventListener("click", async () => {
-    const filas = document.querySelectorAll("#tablaPresion tbody tr");
-    for (const fila of filas) {
-      await guardarRegistro(fila);
-    }
-    await cargarRegistros();
-    alert("Registros guardados correctamente");
-    actualizarResumen();
-  });
+  const filas = document.querySelectorAll("#tablaPresion tbody tr");
 
-  document.getElementById("btnCargar").addEventListener("click", async () => {
-    await cargarRegistros();
-    actualizarResumen();
-  });
+  for (const fila of filas) {
+    await guardarRegistro(fila);
+  }
 
+  await cargarRegistros();
+  alert("Registros guardados correctamente");
+});
+  document.getElementById("btnCargar").addEventListener("click", cargarRegistros);
   document.getElementById("btnCSV").addEventListener("click", exportarCSV);
 
   // Inicializa cargando registros desde BD
   cargarRegistros();
-  actualizarResumen();
 });
